@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, keyCode)
+import Html.Events exposing (on, onInput, keyCode)
 import Json.Decode as Json
 
 
@@ -43,6 +43,7 @@ type alias Model =
 
 type Msg
     = Add Todo
+    | UpdateTitle String
     | Complete Todo
     | Delete Todo
     | Filter FilterState
@@ -65,22 +66,24 @@ initialModel =
     }
 
 
-mockTodo : Todo
-mockTodo =
-    { title = "A mock todo ..."
-    , completed = False
-    , editing = False
-    }
-
-
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         Add todo ->
-            { model | todos = todo :: model.todos }
+            { model | todos = todo :: model.todos, todo = initialModel.todo }
 
         Complete todo ->
             model
+
+        UpdateTitle text ->
+            let
+                todo =
+                    model.todo
+
+                updatedTodo =
+                    { todo | title = text }
+            in
+                { model | todo = updatedTodo }
 
         Delete todo ->
             model
@@ -124,7 +127,8 @@ view model =
                     , placeholder "What needs to be done?"
                     , autofocus True
                     , value model.todo.title
-                    , onEnter (Add mockTodo)
+                    , onEnter (Add model.todo)
+                    , onInput UpdateTitle
                     ]
                     []
                 ]
