@@ -42,11 +42,19 @@ type alias Model =
 
 
 type Msg
-    = Add Todo
-    | UpdateTitle String
+    = Add
+    | UpdateField String
     | Complete Todo
     | Delete Todo
     | Filter FilterState
+
+
+newTodo : Todo
+newTodo =
+    { title = ""
+    , completed = False
+    , editing = False
+    }
 
 
 initialModel : Model
@@ -57,11 +65,7 @@ initialModel =
           , editing = False
           }
         ]
-    , todo =
-        { title = ""
-        , completed = False
-        , editing = False
-        }
+    , todo = newTodo
     , filter = All
     }
 
@@ -69,13 +73,16 @@ initialModel =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Add todo ->
-            { model | todos = todo :: model.todos, todo = initialModel.todo }
+        Add ->
+            { model
+                | todos = model.todo :: model.todos
+                , todo = newTodo
+            }
 
         Complete todo ->
             model
 
-        UpdateTitle text ->
+        UpdateField text ->
             let
                 todo =
                     model.todo
@@ -127,8 +134,8 @@ view model =
                     , placeholder "What needs to be done?"
                     , autofocus True
                     , value model.todo.title
-                    , onEnter (Add model.todo)
-                    , onInput UpdateTitle
+                    , onEnter Add
+                    , onInput UpdateField
                     ]
                     []
                 ]
